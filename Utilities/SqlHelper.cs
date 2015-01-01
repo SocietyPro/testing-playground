@@ -21,19 +21,36 @@ namespace BackendTest.Utilities
 
         public void MockEmptyDataReader()
         {
-            SqlDataReader dr = Mock.Create<SqlDataReader>();
-            Mock.Arrange(() => dr.Read()).Returns(false).InSequence();
-            Mock.Arrange(() => new SqlCommand().ExecuteReader()).Returns(dr);
+            MockDataReader(new List<string>());
         }
 
         public void MockDataReaderWithOneLine(string result)
         {
-            SqlDataReader dr = Mock.Create<SqlDataReader>();
-            byte[] bytes = System.Text.Encoding.UTF8.GetBytes("result");
-            Mock.Arrange(() => dr.Read()).Returns(true).InSequence();
-            Mock.Arrange(() => dr.Read()).Returns(false).InSequence();
-            Mock.Arrange(() => dr[0]).Returns(bytes);
+            List<string> list = new List<string>();
+            list.Add(result);
+            MockDataReader(list);
+            
+        }
+
+        public void MockDataReader(List<string> results)
+        {
+            MockConnection();
+            SqlDataReader dr = Mock.Create<SqlDataReader>();   
             Mock.Arrange(() => new SqlCommand().ExecuteReader()).Returns(dr);
+            foreach (string row in results)
+            {
+               byte[] bytes = System.Text.Encoding.UTF8.GetBytes(row);
+               Mock.Arrange(() => dr.Read()).Returns(true).InSequence(); 
+               Mock.Arrange(() => dr[0]).Returns(bytes).InSequence();
+            }
+            Mock.Arrange(() => dr.Read()).Returns(false).InSequence();
+        }
+
+        public void MockNonQuery()
+        {
+            MockConnection();
+            Mock.Arrange(() => new SqlCommand().ExecuteNonQuery()).DoNothing();
+            //Mock.Assert(() => new SqlCommand().ExecuteNonQuery(), Occurs.Once());
         }
     }
 }

@@ -63,6 +63,7 @@
     <Compile Include="TradeWatchTest.cs" />
     <Compile Include="TradeOrderTest.cs" />
     <Compile Include="Utilities\CacheHelper.cs" />
+    <Compile Include="Utilities\SerializationHelper.cs" />
     <Compile Include="Utilities\TestObjectFactory.cs" />
     <Compile Include="Utilities\SqlHelper.cs" />
     <Compile Include="Utilities\WebRequestHelper.cs" />
