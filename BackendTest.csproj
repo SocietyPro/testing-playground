@@ -58,12 +58,14 @@
     <Compile Include="Shared\CurrencyPairTest.cs" />
     <Compile Include="Shared\CurrencyExchangeTest.cs" />
     <Compile Include="Shared\SqlTest.cs" />
+    <Compile Include="Shared\MarketTest.cs" />
     <Compile Include="Shared\UtilTest.cs" />
     <Compile Include="TradeWatchTest.cs" />
     <Compile Include="TradeOrderTest.cs" />
     <Compile Include="Utilities\CacheHelper.cs" />
     <Compile Include="Utilities\TestObjectFactory.cs" />
     <Compile Include="Utilities\SqlHelper.cs" />
+    <Compile Include="Utilities\WebRequestHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\central-banking\Backend.csproj">

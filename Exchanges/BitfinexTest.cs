@@ -10,38 +10,22 @@ namespace Arbitrage.Exchanges
     public class BitfinexTest
     {
         
+        private WebRequestHelper webHelper = new WebRequestHelper();
         private TestObjectFactory factory = new TestObjectFactory();
-        private HttpWebResponse response;
-        private HttpWebRequest request;
-        private ClientBitfinex client; 
-
-        [TestInitialize]
-        public void Initialize()
-        {
-            client = new ClientBitfinex();
-            request = Mock.Create<HttpWebRequest>();
-            response = Mock.Create<HttpWebResponse>();
-            Mock.SetupStatic<WebRequest>();
-            Mock.Arrange(() => WebRequest.Create(Arg.AnyString)).Returns(request);
-            Mock.Arrange(() => request.GetResponse()).Returns(response);
-            client.ApiPassword = "pwd";
-        }
-
-        [TestCleanup]
-        public void Cleanup()
-        {
-            
-        }
-
+        
         [TestMethod]
         public void TestTradeHistory()
         {
+            ClientBitfinex client = new ClientBitfinex();
+            client.ApiPassword = "pwd";
             using (Stream stream = factory.ToStream("mockedresponse"))
             {
-                Mock.Arrange(() => response.GetResponseStream()).Returns(stream);
+                webHelper.MockRequest(stream);
                 string result = client.GetTradeHistory();
                 Assert.AreEqual("mockedresponse", result);
             }
+            
+            
         }
     }
 }
