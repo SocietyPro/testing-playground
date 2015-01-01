@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Arbitrage;
 
 namespace BackendTest.Utilities
 {
@@ -18,5 +19,7 @@ namespace BackendTest.Utilities
             stream.Position = 0;
             return stream;
         }
+
+       
     }
 }

@@ -1,39 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.IO.Pipes;
-using System.Security.Policy;
-using System.Threading;
+using System.Reflection;
+using System.Security.Permissions;
+using BackendTest.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Telerik.JustMock;
-using Telerik.JustMock.Helpers;
 
 namespace Arbitrage
 {
     [TestClass]
     public class CurrencyPairTest
     {
-        [ClassInitialize()]
-        public static void Init(TestContext context)
-        {
-            Console.WriteLine("Enable Trace");
-            //DebugView.IsTraceEnabled = true;
-        }
 
-        [TestInitialize]
-        public void Setup()
-        {
-            //Mock.Reset();
-            Thread.Sleep(1000);
-            Console.WriteLine("Setup");
-        }
-
-        [TestCleanup]
-        public void Teardown()
-        {
-            Console.WriteLine("Teardown");
-            //Console.WriteLine(DebugView.LastTrace);
-        }
+        private SqlHelper sqlHelper = new SqlHelper();
+        private CacheHelper<CurrencyPair> cacheHelper = new CacheHelper<CurrencyPair>();
+        private TestObjectFactory factory = new TestObjectFactory();
 
         [TestMethod]
         public void TestConstructorWithExchangeAndString()
@@ -63,23 +45,15 @@ namespace Arbitrage
         }
 
         [TestMethod]
-        [Ignore]//Test how replace a constructor in a method
-        public void TestContructorWithMockingNew()
-        {
-            Boolean mocked = false;
-            Mock.Arrange(() => new CurrencyExchange(Arg.IsAny<Currency>(), Arg.IsAny<Exchange>())).DoInstead<Currency, Exchange>((x, y) => mocked = true);
-            CurrencyExchange ce = new CurrencyExchange(Currency.BTC, Exchange.BTCe);
-            CurrencyPair pair = new CurrencyPair(ce, Currency.CNY);   
-            Assert.IsTrue(mocked);
-        }
-
-     
-
-        [TestMethod]
         public void TestFiat()
         {
             CurrencyPair pair = new CurrencyPair(Exchange.Kraken, "USDBTC");
             Assert.AreEqual(Currency.USD, pair.Fiat);
+
+            pair = new CurrencyPair(Exchange.BTCChina, "BTCCNY");
+            Assert.AreEqual(Currency.CNY, pair.Fiat);
+            Assert.AreEqual("[BTCChina]BTC/CNY", pair.ToString());
+
         }
 
         [TestMethod]
@@ -87,6 +61,16 @@ namespace Arbitrage
         {
             CurrencyPair pair = new CurrencyPair("BBTC_OUSD");
             Assert.AreEqual("BBTC_OUSD",pair.Id);
+            Assert.AreEqual("[BTCe]BTC/[OKCoin]USD", pair.ToString());
+        }
+
+        [TestMethod]
+        public void TestInverse()
+        {
+            CurrencyPair pair = new CurrencyPair();
+            pair.Id = "BBTC_OUSD";
+            CurrencyPair reverse = pair.Inverse();
+            Assert.AreEqual("OUSD_BBTC", reverse.Id);
         }
 
         [TestMethod]
@@ -94,12 +78,7 @@ namespace Arbitrage
         {
             CurrencyPair pair = new CurrencyPair("BBTC_OEUR");
             
-            SqlConnection conn = Mock.Create<SqlConnection>();
-            
-            
-            Mock.Arrange(() => Sql.GetConnection(Arg.AnyString)).Returns(conn);
-
-            Mock.Arrange(() => Sql.DbNullToInt(Arg.AnyObject)).CallOriginal();
+            sqlHelper.SetupSql();
             Mock.Arrange(() => new SqlCommand().ExecuteScalar()).Returns(0).InSequence();
             Mock.Arrange(() => new SqlCommand().ExecuteScalar()).Returns(18).InSequence();
             
@@ -110,14 +89,10 @@ namespace Arbitrage
         [TestMethod]
         public void TestExistingDatabaseId()
         {
-            
             CurrencyPair pair = new CurrencyPair("BBTC_OUSD");
-            PrivateAccessor accessor = new PrivateAccessor(pair);
-            
-            SqlConnection conn = Mock.Create<SqlConnection>();
-            
-            Mock.Arrange(() => Sql.GetConnection(Arg.AnyString)).Returns(conn);
-            Mock.Arrange(() => Sql.DbNullToInt(Arg.AnyObject)).CallOriginal();
+            sqlHelper.SetupSql();
+            cacheHelper.ClearTheBitch(pair);
+
             Mock.Arrange(() => new SqlCommand().ExecuteScalar()).Returns(12);
             
             Assert.AreEqual(12, pair.DatabaseId);
@@ -125,6 +100,27 @@ namespace Arbitrage
             
         }
 
-        
+        [TestMethod]
+        public void TestPairNameAtExchanger()
+        {
+            CurrencyExchange exchange = new CurrencyExchange(Currency.CAD, Exchange.Vos);
+            CurrencyPair pair = new CurrencyPair(exchange, Currency.LTC);
+            Assert.AreEqual("CADLTC", pair.PairNameAtExchanger());
+
+            exchange = new CurrencyExchange(Currency.BTC, Exchange.Kraken);
+            pair = new CurrencyPair(exchange, Currency.LTC);
+            Assert.AreEqual("XBTLTC", pair.PairNameAtExchanger());
+
+        }
+
+        [TestMethod]
+        public void TestIsBuy()
+        {
+            CurrencyPair pair = new CurrencyPair("BBTC_VUNK");
+            Assert.IsTrue(pair.IsBuy);
+            pair = new CurrencyPair("BBTC_VCAD");
+            Assert.IsFalse(pair.IsBuy);
+           
+        }
     }
 }

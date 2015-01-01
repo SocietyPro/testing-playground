@@ -61,7 +61,9 @@
     <Compile Include="Shared\UtilTest.cs" />
     <Compile Include="TradeWatchTest.cs" />
     <Compile Include="TradeOrderTest.cs" />
+    <Compile Include="Utilities\CacheHelper.cs" />
     <Compile Include="Utilities\TestObjectFactory.cs" />
+    <Compile Include="Utilities\SqlHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\central-banking\Backend.csproj">
@@ -71,6 +73,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="doc\SetupProject.txt" />
+    <Content Include="doc\Problems.txt" />
+    <Content Include="doc\Techniques.txt" />
+    <Content Include="doc\TestUnresolved techniques.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

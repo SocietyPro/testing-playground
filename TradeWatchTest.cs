@@ -1,4 +1,5 @@
 ﻿using System;
+using BackendTest.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Arbitrage
@@ -6,6 +7,8 @@ namespace Arbitrage
     [TestClass]
     public class TradeWatchTest
     {
+        private SqlHelper setup = new SqlHelper();
+
         [TestMethod]
         [Ignore]
         public void TestCreate()

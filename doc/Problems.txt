@@ -1,0 +1,15 @@
+﻿Inefficient use of Sql connections
+	Trade.Find as an example
+	  Sql.GetConnection create a new connection
+	  Look for CurrencyPair.DatabaseId inside a lock for concurrent Dictionary
+		if not in cache create another connection to query the id
+		if the pair doen't exist in DB, open a third connection and insert in DB
+	  close resources in CurrencyPair
+	  free the lock
+	  Query the DB to look for a trade
+
+Custom cache mecanism keep StrongReference
+	ex: CurrencyPair DatabaseId Dictionary
+
+No bug tracking to see if there is an increase in regressions in recent months.
+

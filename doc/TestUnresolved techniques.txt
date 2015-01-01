@@ -1,0 +1,3 @@
+﻿2 - Create a Mock SqlDataReader with data
+		In Trade.Find, to test values the call (byte[])reader[0] must work
+		Mocking the Deserialize method is good to prevent creation of exact byte[] but, method call fail because of casting.

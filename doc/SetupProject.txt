@@ -1,0 +1,13 @@
+﻿Tools that I used
+JustMock with his profiler, tests use the JustMock framework and the profiler must be turned on for legacy tests
+NCrunch for test coverage, can be replaced with another test coverage except the resharper one, 
+JustMock profiler doesn't work in the Resharper test runner
+
+Get Projects central-banking-backend and central-banking-scraper
+
+Copy Shared directory from central-banking-scraper to central-banking-backend.  
+We can't extract the shared in library because they are used in compilation of partial classes.
+
+Close Public Data project
+
+
