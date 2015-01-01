@@ -78,7 +78,7 @@ namespace Arbitrage
         {
             CurrencyPair pair = new CurrencyPair("BBTC_OEUR");
             
-            sqlHelper.SetupSql();
+            sqlHelper.MockConnection();
             Mock.Arrange(() => new SqlCommand().ExecuteScalar()).Returns(0).InSequence();
             Mock.Arrange(() => new SqlCommand().ExecuteScalar()).Returns(18).InSequence();
             
@@ -90,7 +90,7 @@ namespace Arbitrage
         public void TestExistingDatabaseId()
         {
             CurrencyPair pair = new CurrencyPair("BBTC_OUSD");
-            sqlHelper.SetupSql();
+            sqlHelper.MockConnection();
             cacheHelper.ClearTheBitch(pair);
 
             Mock.Arrange(() => new SqlCommand().ExecuteScalar()).Returns(12);

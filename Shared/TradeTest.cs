@@ -16,7 +16,7 @@ namespace Arbitrage
         [TestMethod]
         public void TestFindEmpty()
         {
-            setup.SetupSql();
+            setup.MockConnection();
             Mock.SetupStatic(typeof(Trade), Behavior.CallOriginal);
 
             Trade trade = new Trade();
