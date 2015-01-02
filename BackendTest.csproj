@@ -33,6 +33,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\central-banking\packages\Newtonsoft.Json.6.0.6\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="SuperWebSocket, Version=0.8.0.0, Culture=neutral, PublicKeyToken=7ba53b9a7cef5d1c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\central-banking-scraper\packages\SuperWebSocketNETServer.0.8\lib\net40\SuperWebSocket.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -66,7 +74,7 @@
     <Compile Include="Utilities\SerializationHelper.cs" />
     <Compile Include="Utilities\TestObjectFactory.cs" />
     <Compile Include="Utilities\SqlHelper.cs" />
-    <Compile Include="Utilities\WebRequestHelper.cs" />
+    <Compile Include="Utilities\WebHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\central-banking\Backend.csproj">

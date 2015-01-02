@@ -50,7 +50,31 @@ namespace Arbitrage
             
         }
 
+        [TestMethod]
+        public void TestFindNumberAfter()
+        {
+            string data = "0abcdef1ghijkl2mnopqr3stuvwx4yz5";
+            Assert.AreEqual(1,Util.FindNumberAfter("b", data));
+        }
         
-        
+        [TestMethod]
+        public void TestIsSameValue()
+        {
+            Assert.IsTrue(Util.IsSameValue(new Decimal(0.1), new Decimal(0.1)));
+            Assert.IsFalse(Util.IsSameValue(new Decimal(1.00001), new Decimal(0.00001)));
+            Assert.IsFalse(Util.IsSameValue(new Decimal(-1.1), new Decimal(0)));
+        }
+
+        [TestMethod]
+        public void TestStrToInt()
+        {
+            Assert.AreEqual(2, Util.StrToInt("2"));
+            Assert.AreEqual(-1, Util.StrToInt("-1"));
+            Assert.AreEqual(0, Util.StrToInt("0.1"));
+            Assert.AreEqual(0, Util.StrToInt("a"));
+            Assert.AreEqual(0, Util.StrToInt("", 0));
+            Assert.AreEqual(1000, Util.StrToInt("0.1",1000));
+            
+        }
     }
 }

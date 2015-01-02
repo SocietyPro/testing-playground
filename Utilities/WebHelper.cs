@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+using Arbitrage;
 using Telerik.JustMock;
 
 namespace BackendTest.Utilities
 {
-    public class WebRequestHelper
+    public class WebHelper
     {
         
 
@@ -24,5 +20,6 @@ namespace BackendTest.Utilities
             Mock.Arrange(() => response.GetResponseStream()).Returns(resultStream);
             
         }
+
     }
 }

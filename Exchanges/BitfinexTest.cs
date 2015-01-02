@@ -1,6 +1,10 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using BackendTest.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json.Linq;
+using Telerik.JustMock;
+using Telerik.JustMock.Helpers;
 
 namespace Arbitrage.Exchanges
 {
@@ -8,7 +12,7 @@ namespace Arbitrage.Exchanges
     public class BitfinexTest
     {
         
-        private readonly WebRequestHelper webHelper = new WebRequestHelper();
+        private readonly WebHelper webHelper = new WebHelper();
         private readonly TestObjectFactory factory = new TestObjectFactory();
         private ClientBitfinex client;
 
@@ -34,10 +38,11 @@ namespace Arbitrage.Exchanges
         [TestMethod]
         public void TestExecuteTradeOrder()
         {
+            Mock.Arrange(()=>client.SupportedPairs.Contains(Arg.IsAny<CurrencyPair>())).Returns(true);
             using (Stream stream = factory.ToStream("mockedresponse"))
             {
                 webHelper.MockRequest(stream);
-                TradeOrder order = CreateOrder();
+                TradeOrder order = factory.CreateTradeOrder("1");
                 client.ExecuteTradeOrder(order);
             }
         }
@@ -49,7 +54,7 @@ namespace Arbitrage.Exchanges
             {
                 webHelper.MockRequest(stream);
                 ClientBitfinex client = CreateClient();
-                TradeOrder order = CreateOrder();
+                TradeOrder order = factory.CreateTradeOrder("1");
                 client.TradeOrderCancel(order, "reason");
             }
         }
@@ -60,7 +65,7 @@ namespace Arbitrage.Exchanges
             using (Stream stream = factory.ToStream("mockedresponse"))
             {
                 webHelper.MockRequest(stream);
-                TradeOrder order = CreateOrder();
+                TradeOrder order = factory.CreateTradeOrder("1");
                 client.AdjustBalances(order);
             }
         }
@@ -68,30 +73,38 @@ namespace Arbitrage.Exchanges
         [TestMethod]
         public void TestRefreshTradeOrder()
         {
+            TradeOrder order = factory.CreateTradeOrder("1");
+            JObject jsonObject = Mock.Create<JObject>();
+            Mock.Arrange(() => JObject.Parse(Arg.AnyString)).Returns(jsonObject);
+            Mock.Arrange(() => order.Save()).DoNothing();
+
             using (Stream stream = factory.ToStream("mockedresponse"))
             {
                 webHelper.MockRequest(stream);
-                TradeOrder order = CreateOrder();
+                
                 client.RefreshTradeOrder(order);
             }
         }
 
+        [TestMethod]
+        public void TestAsyncRefreshBalance()
+        {
+            client.AsyncRefreshBalance();
+        }
+
         private ClientBitfinex CreateClient()
         {
+           
             ClientBitfinex c = new ClientBitfinex();
+            
             c.ApiPassword = "pwd";
             c.ApiKey = "key";
+            
             c.Init();
             return c;
 
         }
 
-        private TradeOrder CreateOrder()
-        {
-            TradeOrder order = new TradeOrder();
-            return order;
-
-
-        }
+        
     }
 }

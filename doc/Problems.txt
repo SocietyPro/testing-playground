@@ -13,3 +13,6 @@ Custom cache mecanism keep StrongReference
 
 No bug tracking to see if there is an increase in regressions in recent months.
 
+Lack of coherence, 2 different ways to serialize/parse Json and ConcurrentDictionary for Balances in exchange vs the cache at TradeOrder level
+
+

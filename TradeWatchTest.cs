@@ -8,16 +8,26 @@ namespace Arbitrage
     public class TradeWatchTest
     {
         private SqlHelper setup = new SqlHelper();
+        private TestObjectFactory factory = new TestObjectFactory();
 
         [TestMethod]
-        [Ignore]
         public void TestCreate()
         {
             TradeWatch watch = new TradeWatch();
             watch.Id = new Guid();
-            TradeOrder order = new TradeOrder();
+            TradeOrder order = factory.CreateTradeOrder("1");
             watch.Order = order;
             watch.Create();
+        }
+
+        [TestMethod]
+        public void TestExecuteTakerOrderIfNeeded()
+        {
+            TradeWatch watch = new TradeWatch();
+            TradeOrder order = factory.CreateTradeOrder("1");
+            watch.Order = order;
+            watch.Id = new Guid();
+            watch.ExecuteTakerOrderIfNeeded();
         }
     }
 }
