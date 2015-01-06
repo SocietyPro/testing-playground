@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Arbitrage;
 using Telerik.JustMock;
 
-namespace BackendTest.Utilities
+namespace Arbitrage.Utilities
 {
     public class SqlHelper
     {

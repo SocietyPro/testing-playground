@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BackendTest.Utilities
+namespace Arbitrage.Utilities
 {
     public class CacheHelper<T>
     {

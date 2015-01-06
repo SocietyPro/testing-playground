@@ -2,7 +2,7 @@
 using Arbitrage;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace BackendTest.Shared
+namespace Arbitrage.Shared
 {
     [TestClass]
     public class MarketTest

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Telerik.JustMock;
 
-namespace BackendTest.Utilities
+namespace Arbitrage.Utilities
 {
     class SerializationHelper<T>
     {

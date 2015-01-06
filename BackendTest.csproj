@@ -9,7 +9,7 @@
     <ProjectGuid>{ED2C9EBA-64FA-4471-80B7-40F524F2C8BC}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BackendTest</RootNamespace>
+    <RootNamespace>Arbitrage</RootNamespace>
     <AssemblyName>BackendTest</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -37,10 +37,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\central-banking\packages\Newtonsoft.Json.6.0.6\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="SuperWebSocket, Version=0.8.0.0, Culture=neutral, PublicKeyToken=7ba53b9a7cef5d1c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\central-banking-scraper\packages\SuperWebSocketNETServer.0.8\lib\net40\SuperWebSocket.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -58,6 +54,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Exchanges\BitfinexTest.cs" />
+    <Compile Include="Exchanges\ExchangeBaseTest.cs" />
+    <Compile Include="Exchanges\BTCChinaClientTest.cs" />
+    <Compile Include="Exchanges\VaultOfSatoshiTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shared\CurrencyTest.cs" />
     <Compile Include="Shared\ExchangeUtilTest.cs" />
@@ -70,6 +69,8 @@
     <Compile Include="Shared\UtilTest.cs" />
     <Compile Include="TradeWatchTest.cs" />
     <Compile Include="TradeOrderTest.cs" />
+    <Compile Include="DatabaseTest.cs" />
+    <Compile Include="BalanceTest.cs" />
     <Compile Include="Utilities\CacheHelper.cs" />
     <Compile Include="Utilities\SerializationHelper.cs" />
     <Compile Include="Utilities\TestObjectFactory.cs" />
