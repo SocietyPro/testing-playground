@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Arbitrage;
+using Telerik.JustMock;
 
 namespace Arbitrage.Utilities
 {
@@ -20,6 +21,13 @@ namespace Arbitrage.Utilities
             return stream;
         }
 
+        public TradeOrder CreateTradeOrderWithoutOperations(string id)
+        {
+            TradeOrder order = Mock.Create<TradeOrder>(Behavior.CallOriginal);
+            Mock.Arrange(()=> order.Save()).DoNothing();
+            return order;
+        }
+
         public TradeOrder CreateTradeOrder(string id)
         {
             TradeOrder order = new TradeOrder();
@@ -33,6 +41,7 @@ namespace Arbitrage.Utilities
             order.Active = true;
             order.VolumeExecutedAtMarket = 12;
             order.VolumeReceivedAtMarket = 15;
+            order.VolumeBalanceReportedReceived = 13;
             return order;
         }
        

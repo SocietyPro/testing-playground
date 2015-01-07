@@ -4,6 +4,7 @@ using Arbitrage.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json.Linq;
 using Telerik.JustMock;
+using Telerik.JustMock.Helpers;
 
 namespace Arbitrage.Exchanges
 {
@@ -12,25 +13,12 @@ namespace Arbitrage.Exchanges
     {
         private readonly WebHelper webHelper = new WebHelper();
         private readonly TestObjectFactory factory = new TestObjectFactory();
-        private ClientBitfinex client;
+        private ExchangeBase client;
 
         [TestInitialize]
         public void Setup()
         {
             client = CreateClient();
-        }
-
-        [TestMethod]
-        public void TestTradeHistory()
-        {
-            
-            using (Stream stream = factory.ToStream("mockedresponse"))
-            {
-                webHelper.MockRequest(stream);
-                string result = client.GetTradeHistory();
-                Assert.AreEqual("mockedresponse", result);
-            }
-            
         }
 
         [TestMethod]
@@ -47,48 +35,48 @@ namespace Arbitrage.Exchanges
         }
 
         [TestMethod]
-        [Ignore]
         public void TestTradeOrderCancel()
         {
-            JObject mock = Mock.Create<JObject>();
-            Mock.Arrange(() => JObject.Parse(Arg.AnyString)).Returns(mock);
-            Mock.Arrange(() => mock["id"]).Returns("1");
-            using (Stream stream = factory.ToStream("mockedresponse"))
-            {
-                webHelper.MockRequest(stream);
-                ClientBitfinex client = CreateClient();
-                TradeOrder order = factory.CreateTradeOrder("1");
-                Assert.IsTrue(client.TradeOrderCancel(order, "reason"));
-            }
+            Mock.SetupStatic(typeof(TradeLog));
+            Mock.NonPublic.Arrange<bool>(client, "_TradeOrderCancel", ArgExpr.IsAny<TradeOrder>()).Returns(true).OccursOnce();
+            Mock.Arrange(() => TradeLog.Log(Arg.Matches<string>(x => x.Contains("Canceled Trade Order success")))).OccursOnce();
+            Mock.NonPublic.Arrange(client, "_RefreshTradeOrder", (ArgExpr.IsAny<TradeOrder>())).DoNothing().OccursOnce();
+            Mock.NonPublic.Arrange(client, "TradeOrderUpdate", (ArgExpr.IsAny<TradeOrder>())).DoNothing().OccursOnce();
+            
+            TradeOrder order = factory.CreateTradeOrder("1");
+            Assert.IsTrue(client.TradeOrderCancel(order, "reason"));
+            Assert.IsFalse(order.Active);
+            
         }
 
         [TestMethod]
-        [Ignore]
         public void TestAdjustBalances()
         {
-            using (Stream stream = factory.ToStream("mockedresponse"))
-            {
-                webHelper.MockRequest(stream);
-                TradeOrder order = factory.CreateTradeOrder("1");
-                client.AdjustBalances(order);
-            }
+            Mock.SetupStatic(typeof(WebSocketServer));
+            Mock.SetupStatic(typeof(TradeWatch));
+            Mock.SetupStatic(typeof(FundInfo));
+            Mock.Arrange(()=> WebSocketServer.Current.Broadcast(Arg.IsAny<Balance>(), Arg.IsAny<Subscription>())).DoNothing().Occurs(2);
+            Mock.Arrange(() => TradeWatch.SaveToDisk()).DoNothing();
+            Mock.Arrange(() => FundInfo.GetFundInfo(Arg.AnyBool,Arg.AnyString)).DoNothing();
+
+            TradeOrder order = factory.CreateTradeOrder("1");
+            Balance balance = new Balance(Exchange.Bitfinex, Currency.CNY);
+            balance.AmountAvailable = 5000;
+            Balance toBalance = new Balance(Exchange.Bitfinex, Currency.BTC);
+            toBalance.AmountAvailable = 100;
+            client.Balances.TryAdd(Currency.CNY, balance);
+            client.Balances.TryAdd(Currency.BTC, toBalance);
+            client.AdjustBalances(order);
+            
         }
 
         [TestMethod]
-        [Ignore]
         public void TestRefreshTradeOrder()
         {
-            TradeOrder order = factory.CreateTradeOrder("1");
-            JObject jsonObject = Mock.Create<JObject>();
-            Mock.Arrange(() => JObject.Parse(Arg.AnyString)).Returns(jsonObject);
-            Mock.Arrange(() => order.Save()).DoNothing();
-
-            using (Stream stream = factory.ToStream("mockedresponse"))
-            {
-                webHelper.MockRequest(stream);
-                
-                client.RefreshTradeOrder(order);
-            }
+            Mock.NonPublic.Arrange(client, "_RefreshTradeOrder", ArgExpr.IsAny<TradeOrder>()).DoNothing().OccursOnce();
+            TradeOrder order = factory.CreateTradeOrderWithoutOperations("1");
+            order.Dirty = true;
+            client.RefreshTradeOrder(order);
         }
 
         [TestMethod]
@@ -98,7 +86,7 @@ namespace Arbitrage.Exchanges
             client.AsyncRefreshBalance();
         }
 
-        private ClientBitfinex CreateClient()
+        private ExchangeBase CreateClient()
         {
             ClientBitfinex c = Mock.Create<ClientBitfinex>(Behavior.CallOriginal);
             c.ApiPassword = "pwd";

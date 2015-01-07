@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Threading;
 using Arbitrage.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Telerik.JustMock;
 using Telerik.JustMock.Helpers;

@@ -37,6 +37,14 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\central-banking\packages\Newtonsoft.Json.6.0.6\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="SuperSocket.SocketBase, Version=1.5.3.0, Culture=neutral, PublicKeyToken=6c80000676988ebb, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\central-banking\bin\Debug\SuperSocket.SocketBase.dll</HintPath>
+    </Reference>
+    <Reference Include="SuperWebSocket, Version=0.8.0.0, Culture=neutral, PublicKeyToken=7ba53b9a7cef5d1c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\central-banking\bin\Debug\SuperWebSocket.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -71,6 +79,7 @@
     <Compile Include="TradeOrderTest.cs" />
     <Compile Include="DatabaseTest.cs" />
     <Compile Include="BalanceTest.cs" />
+    <Compile Include="WebSocketServerTest.cs" />
     <Compile Include="Utilities\CacheHelper.cs" />
     <Compile Include="Utilities\SerializationHelper.cs" />
     <Compile Include="Utilities\TestObjectFactory.cs" />

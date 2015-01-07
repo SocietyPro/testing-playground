@@ -22,6 +22,7 @@ namespace Arbitrage.Exchanges
         }
 
         [TestMethod]
+        [Ignore]
         public void TestSendPrivateRequest()
         {
             //JToken SendPrivateRequest(string urlPath, out string error, Dictionary<string, string> parameters = null) 

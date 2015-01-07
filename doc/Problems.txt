@@ -19,4 +19,8 @@ In bitfinex _TradeOrderCancel
 	First trade.Active in if that do nothing
 		Even if the tradeOrder is completed will wait 500ms and refresh.
 
+In ExchangeBase.AdjustBalances
+	If Balance is not in ConcurrentDictionary, create a new one(From and To) and DebugAssert fail in properties of Balance with 0 values.
+	Possible dead code??
+
 
