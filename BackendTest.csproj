@@ -64,7 +64,6 @@
     <Compile Include="Exchanges\BitfinexTest.cs" />
     <Compile Include="Exchanges\ExchangeBaseTest.cs" />
     <Compile Include="Exchanges\BTCChinaClientTest.cs" />
-    <Compile Include="Exchanges\VaultOfSatoshiTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shared\CurrencyTest.cs" />
     <Compile Include="Shared\ExchangeUtilTest.cs" />
@@ -79,6 +78,7 @@
     <Compile Include="TradeOrderTest.cs" />
     <Compile Include="DatabaseTest.cs" />
     <Compile Include="BalanceTest.cs" />
+    <Compile Include="Utilities\LogHelper.cs" />
     <Compile Include="WebSocketServerTest.cs" />
     <Compile Include="Utilities\CacheHelper.cs" />
     <Compile Include="Utilities\SerializationHelper.cs" />

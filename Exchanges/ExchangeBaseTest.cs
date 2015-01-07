@@ -2,9 +2,7 @@
 using System.IO;
 using Arbitrage.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json.Linq;
 using Telerik.JustMock;
-using Telerik.JustMock.Helpers;
 
 namespace Arbitrage.Exchanges
 {
@@ -55,7 +53,8 @@ namespace Arbitrage.Exchanges
             Mock.SetupStatic(typeof(WebSocketServer));
             Mock.SetupStatic(typeof(TradeWatch));
             Mock.SetupStatic(typeof(FundInfo));
-            Mock.Arrange(()=> WebSocketServer.Current.Broadcast(Arg.IsAny<Balance>(), Arg.IsAny<Subscription>())).DoNothing().Occurs(2);
+            
+            Mock.Arrange(()=> WebSocketServer.Current.Broadcast(Arg.IsAny<IMessage>())).DoNothing().Occurs(2);
             Mock.Arrange(() => TradeWatch.SaveToDisk()).DoNothing();
             Mock.Arrange(() => FundInfo.GetFundInfo(Arg.AnyBool,Arg.AnyString)).DoNothing();
 

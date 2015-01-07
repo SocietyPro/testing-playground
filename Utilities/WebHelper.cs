@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Net;
-using Arbitrage;
 using Telerik.JustMock;
 
 namespace Arbitrage.Utilities
@@ -8,7 +7,6 @@ namespace Arbitrage.Utilities
     public class WebHelper
     {
         
-
         public void MockRequest(Stream resultStream)
         {
             HttpWebResponse response = Mock.Create<HttpWebResponse>();
@@ -21,7 +19,7 @@ namespace Arbitrage.Utilities
             
         }
 
-         public void MockRequestError(Stream resultStream)
+        public void MockRequestError(Stream resultStream)
         {
             HttpWebRequest request = Mock.Create<HttpWebRequest>();
             HttpWebResponse response = Mock.Create<HttpWebResponse>();
@@ -32,6 +30,17 @@ namespace Arbitrage.Utilities
             Mock.Arrange(() => request.GetResponse()).Throws(ex);
             Mock.Arrange(() => response.GetResponseStream()).Returns(resultStream);
             Mock.Arrange(() => ex.Response).Returns(response);
+        }
+
+        public static void MockWebSocketServer()
+        {
+            Mock.SetupStatic(typeof(WebSocketServer));
+            WebSocketServer server = Mock.Create<WebSocketServer>(Behavior.Strict);
+            Mock.Arrange(() => WebSocketServer.Current).Returns(server);
+            //Mock.Arrange(() => server.Broadcast(Arg.IsAny<TradeWatch>(), Arg.IsAny<Subscription>())).DoNothing();
+            Mock.Arrange(() => server.Broadcast(Arg.IsAny<IMessage>())).DoNothing();
+
+            
         }
 
     }

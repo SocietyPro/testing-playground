@@ -1,5 +1,4 @@
 ﻿using System;
-using Arbitrage;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Arbitrage.Shared

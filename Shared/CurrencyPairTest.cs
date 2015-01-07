@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Reflection;
-using System.Security.Permissions;
 using Arbitrage.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Telerik.JustMock;
@@ -13,10 +10,9 @@ namespace Arbitrage
     public class CurrencyPairTest
     {
 
-        private SqlHelper sqlHelper = new SqlHelper();
-        private CacheHelper<CurrencyPair> cacheHelper = new CacheHelper<CurrencyPair>();
-        private TestObjectFactory factory = new TestObjectFactory();
-
+        private readonly SqlHelper sqlHelper = new SqlHelper();
+        private readonly CacheHelper<CurrencyPair> cacheHelper = new CacheHelper<CurrencyPair>();
+        
         [TestMethod]
         public void TestConstructorWithExchangeAndString()
         {
@@ -103,7 +99,7 @@ namespace Arbitrage
         [TestMethod]
         public void TestPairNameAtExchanger()
         {
-            CurrencyExchange exchange = new CurrencyExchange(Currency.CAD, Exchange.Vos);
+            CurrencyExchange exchange = new CurrencyExchange(Currency.CAD, Exchange.BTCChina);
             CurrencyPair pair = new CurrencyPair(exchange, Currency.LTC);
             Assert.AreEqual("CADLTC", pair.PairNameAtExchanger());
 
@@ -116,9 +112,9 @@ namespace Arbitrage
         [TestMethod]
         public void TestIsBuy()
         {
-            CurrencyPair pair = new CurrencyPair("BBTC_VUNK");
+            CurrencyPair pair = new CurrencyPair("BBTC_KUNK");
             Assert.IsTrue(pair.IsBuy);
-            pair = new CurrencyPair("BBTC_VCAD");
+            pair = new CurrencyPair("BBTC_KCAD");
             Assert.IsFalse(pair.IsBuy);
            
         }

@@ -79,7 +79,7 @@ namespace Arbitrage.Exchanges
         {
             Mock.NonPublic.Arrange(client, "SetBalance", ArgExpr.IsAny<Currency>(), ArgExpr.IsAny<decimal>(), ArgExpr.IsAny<decimal>(), ArgExpr.IsAny<decimal>()).DoNothing();
             JArray array = new JArray();
-            JObject jsonOrder = createJsonBalance();
+            JObject jsonOrder = CreateJsonBalance();
           
             array.Add(jsonOrder);
           
@@ -217,7 +217,7 @@ namespace Arbitrage.Exchanges
             return jsonObject;
         }
 
-        private JObject createJsonBalance()
+        private JObject CreateJsonBalance()
         {
             JObject jsonOrder = new JObject();
             jsonOrder["id"] = "1";

@@ -25,7 +25,7 @@ namespace Arbitrage
             Assert.AreEqual(Exchange.Bitfinex, ExchangeUtil.PrefixToExchange("F"));
             Assert.AreEqual(Exchange.Kraken, ExchangeUtil.PrefixToExchange("K"));
             Assert.AreEqual(Exchange.OKCoin, ExchangeUtil.PrefixToExchange("O"));
-            Assert.AreEqual(Exchange.Vos, ExchangeUtil.PrefixToExchange("V"));
+            
         }
     }
 }

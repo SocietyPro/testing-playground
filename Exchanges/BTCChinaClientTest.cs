@@ -7,7 +7,7 @@ using Telerik.JustMock;
 namespace Arbitrage.Exchanges
 {
     [TestClass]
-    public class BTCChinaClientTest
+    public class BtcChinaClientTest
     {
         private ClientBTCChina client;
         private PrivateAccessor accessor;

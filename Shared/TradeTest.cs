@@ -1,22 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.SqlClient;
 using Arbitrage.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Telerik.JustMock;
-using Telerik.JustMock.Helpers;
 
 namespace Arbitrage
 {
     [TestClass]
     public class TradeTest
     {
-        private SqlHelper setup = new SqlHelper();
+        private readonly SqlHelper sqlHelper = new SqlHelper();
         [TestMethod]
         public void TestFindEmpty()
         {
-            setup.MockConnection();
+            sqlHelper.MockConnection();
             Mock.SetupStatic(typeof(Trade), Behavior.CallOriginal);
 
             Trade trade = new Trade();

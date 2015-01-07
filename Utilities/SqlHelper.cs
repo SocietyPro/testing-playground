@@ -2,10 +2,6 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Arbitrage;
 using Telerik.JustMock;
 
 namespace Arbitrage.Utilities

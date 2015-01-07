@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
-using Arbitrage;
 using Arbitrage.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Telerik.JustMock;
 
 namespace Arbitrage
 {
@@ -13,12 +10,12 @@ namespace Arbitrage
     {
         private readonly SqlHelper sqlHelper = new SqlHelper();
         private readonly SerializationHelper<TradeOrder> serializationHelper = new SerializationHelper<TradeOrder>();
-        private TestObjectFactory factory = new TestObjectFactory();
+        private readonly TestObjectFactory factory = new TestObjectFactory();
         
         [TestMethod]
         public void TestFindNoItem()
         {
-            TradeOrder order = factory.CreateTradeOrder("1");
+            
             sqlHelper.MockEmptyDataReader();
             
             List<TradeOrder> list = TradeOrder.Find(123);

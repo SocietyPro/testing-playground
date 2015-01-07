@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Diagnostics;
+using System.Collections.Generic;
 using Arbitrage.Exchanges;
 using Arbitrage.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Telerik.JustMock;
-using System.Collections.Generic;
 
 namespace Arbitrage
 {
@@ -16,51 +15,38 @@ namespace Arbitrage
         private static Database db;
 
         private ExchangeBase exchangeBase;
+        
 
         [ClassInitialize]
-        public static void init()
+        public static void Init()
         {
 
             Mock.SetupStatic(typeof(TradeWatch));
-            MockWebSocketServer();
-
+            WebHelper.MockWebSocketServer();
             Mock.SetupStatic(typeof(Database));
-
-            MockTradeLog();
-
+            LogHelper.MockTradeLog();
 
         }
-
-        
 
         
 
         [TestInitialize]
-        public void setup()
+        public void Setup()
         {
-            
-            watch = Mock.Create<TradeWatch>(Behavior.CallOriginal);
-            watch.Id = new Guid();
-            Mock.Arrange(() => TradeWatch.SaveToDisk()).DoNothing();
+            CreateTradeWatch();
 
             db = Mock.Create<Database>(Behavior.Strict);
             Mock.Arrange(() => Database.Current).Returns(db);
 
-            ExchangeRate exchangeRate = Mock.Create<ExchangeRate>();
-            Dictionary<Currency, decimal> rates = new Dictionary<Currency, decimal>();
-            rates.Add(Currency.USD,new decimal(1.1));
-            rates.Add(Currency.CNY,new decimal(10.8));
-            exchangeRate.Rates = rates;
+            ExchangeRate exchangeRate = CreateExchangeRate();
             db.ExchangeRate = exchangeRate;
 
             exchangeBase = Mock.Create<ExchangeBase>(Behavior.Strict);
             Mock.Arrange(() => exchangeRate.GetRate(Arg.IsAny<Currency>())).Returns(new Decimal(1));
-            
             Mock.Arrange(() => db.GetExchange(Arg.IsAny<Exchange>())).Returns(exchangeBase);
-           
         }
-
-        
+ 
+       
 
         [TestMethod]
         public void TestCreateWithoutVolume()
@@ -94,10 +80,8 @@ namespace Arbitrage
             Mock.Arrange(() => exchangeBase.ExecuteTradeOrder(Arg.IsAny<TradeOrder>())).DoInstead((TradeOrder o) => o.Id="ID");
             Mock.Arrange(() => exchangeBase.PreventPlacingMakerOrderAtMarketPrice).Returns(true);
             MockLastTrade(12.1);
-            TradeOrder order = new TradeOrder();
-            order.Volume = 100;
-            order.Price = 25;
-            order.Pair = new CurrencyPair(Exchange.Bitfinex, Currency.BTC, Currency.USD);
+            TradeOrder order = CreateTradeOrder(25);
+            
             watch.Order = order;
             watch.Create();
             Assert.IsNull(order.Error);
@@ -114,10 +98,7 @@ namespace Arbitrage
             Mock.Arrange(() => exchangeBase.PreventPlacingMakerOrderAtMarketPrice).Returns(true);
 
             MockLastTrade(12.1);
-            TradeOrder order = new TradeOrder();
-            order.Volume = 100;
-            order.Price = 10;
-            order.Pair = new CurrencyPair(Exchange.Bitfinex, Currency.BTC, Currency.USD);
+            TradeOrder order = CreateTradeOrder();
             watch.Order = order;
             watch.Create();
             Assert.IsNull(order.Error);
@@ -130,12 +111,8 @@ namespace Arbitrage
         public void TestCancelActiveOrder()
         {
             Mock.Arrange(() => exchangeBase.TradeOrderCancel(Arg.IsAny<TradeOrder>(), Arg.AnyString)).DoInstead((TradeOrder o)=>o.IsCancelling = false);
-           
-            TradeOrder order = Mock.Create<TradeOrder>(Behavior.CallOriginal);
-            order.Volume = 100;
-            order.Price = 10;
-            order.Pair = new CurrencyPair(Exchange.Bitfinex, Currency.BTC, Currency.USD);
-            order.Active = true;
+
+            TradeOrder order = CreateTradeOrder();
             
             watch.Order = order;
             TradeWatch.Trades.Add(watch);
@@ -148,12 +125,8 @@ namespace Arbitrage
         {
             Mock.Arrange(() => exchangeBase.TradeOrderCancel(Arg.IsAny<TradeOrder>(), Arg.AnyString)).DoInstead((TradeOrder o)=>o.IsCancelling = false);
             
-            TradeOrder order = Mock.Create<TradeOrder>(Behavior.CallOriginal);
+            TradeOrder order = CreateTradeOrder();
             Mock.Arrange(() => order.Status).Returns(TradeOrderStatus.Executed);
-            order.Volume = 100;
-            order.Price = 10;
-            order.Pair = new CurrencyPair(Exchange.Bitfinex, Currency.BTC, Currency.USD);
-            order.Active = true;
             
             watch.Order = order;
             TradeWatch.Trades.Add(watch);
@@ -161,6 +134,89 @@ namespace Arbitrage
             Assert.IsNull(order.Error);
         }
 
+        [TestMethod]
+        public void TestDeleteExecutedOrder()
+        {
+            Mock.Arrange(() => exchangeBase.MonitoringTradeOrderRemove(Arg.IsAny<TradeOrder>())).DoNothing();
+            
+            TradeOrder order = CreateTradeOrder();
+            watch.Order = order;
+            Mock.Arrange(() => order.Status).Returns(TradeOrderStatus.Executed);
+            TradeWatch.Trades.Add(watch);
+            List<TradeOrder> orderList = new List<TradeOrder>();
+            orderList.Add(order);
+            watch.TakerOrders=orderList;
+           
+            watch.Delete();
+            Assert.IsNull(order.Error);
+            Assert.IsTrue(watch.IsDelete);
+            Assert.IsFalse(TradeWatch.Trades.Contains(watch));
+        }
+
+        [TestMethod]
+        public void TestImproveActiveOrder()
+        {
+            TraderSession session = Mock.Create<TraderSession>(Behavior.Strict);
+            Mock.Arrange(() => session.SetTradeWatch(Arg.IsAny<TradeWatch>())).DoNothing();
+            db.Session = session;
+            Mock.Arrange(() => exchangeBase.TradeOrderCancel(Arg.IsAny<TradeOrder>(), Arg.AnyString)).DoInstead((TradeOrder o)=>o.IsCancelling = false);
+            
+            TradeOrder order = CreateTradeOrder();
+            watch.ImproveBy(order,new Decimal(21.2),"test_reason");
+            Assert.AreEqual(0, watch.NbTakerOrders);
+        }
+
+        [TestMethod]
+        public void TestImprovePartiallyExecutedOrder()
+        {
+            TraderSession session = Mock.Create<TraderSession>(Behavior.Strict);
+            Mock.Arrange(() => session.SetTradeWatch(Arg.IsAny<TradeWatch>())).DoNothing();
+            db.Session = session;
+            Mock.Arrange(() => exchangeBase.TradeOrderCancel(Arg.IsAny<TradeOrder>(), Arg.AnyString)).DoInstead((TradeOrder o)=>o.IsCancelling = false);
+            Mock.Arrange(() => exchangeBase.RefreshTradeOrder(Arg.IsAny<TradeOrder>(), Arg.AnyDateTime)).DoNothing();
+            Mock.Arrange(() => exchangeBase.ExecuteTradeOrder(Arg.IsAny<TradeOrder>())).DoInstead((TradeOrder o) => o.Active=true);
+            Mock.Arrange(() => exchangeBase.MonitoringTradeOrderAdd(Arg.IsAny<TradeOrder>())).DoNothing();
+           
+
+            TradeOrder order = CreateTradeOrder();
+            Mock.Arrange(() => order.Status).Returns(TradeOrderStatus.PartiallyExecuted);
+            Mock.Arrange(() => order.Active).Returns(false);
+
+            List<TradeOrder> orderList = new List<TradeOrder>();
+            orderList.Add(order);
+            watch.TakerOrders=orderList;
+           
+
+            watch.ImproveBy(order,new Decimal(21.2),"test_reason");
+            Assert.AreEqual(1, watch.NbTakerOrders);
+        }
+
+        [TestMethod]
+        public void TestSetOrderToTopOfOpenBook()
+        {
+            TradeOrder order = CreateTradeOrder();
+            watch.Order = order;
+            watch.SetOrderToTopOfOpenBook(order);
+               
+        }
+
+        [TestMethod]
+        public void TestExecuteTakerOrderIfNeeded()
+        {
+            TradeOrder order = CreateTradeOrder();
+            watch.Order = order;
+            watch.ExecuteTakerOrderIfNeeded();
+               
+        }
+
+        [TestMethod]
+        public void TestCheckForRecreation()
+        {
+            TradeOrder order = CreateTradeOrder();
+            watch.Order = order;
+            watch.CheckForRecreation();
+               
+        }
 
         private void MockLastTrade(double price)
         {
@@ -169,18 +225,37 @@ namespace Arbitrage
             Mock.Arrange(() => db.LastPriceGet(Arg.IsAny<CurrencyPair>())).Returns(trade);
         }
 
-        private static void MockWebSocketServer()
+        private ExchangeRate CreateExchangeRate()
         {
-            Mock.SetupStatic(typeof(WebSocketServer));
-            WebSocketServer server = Mock.Create<WebSocketServer>(Behavior.Strict);
-            Mock.Arrange(() => WebSocketServer.Current).Returns(server);
-            Mock.Arrange(() => server.Broadcast(Arg.IsAny<TradeWatch>(), Arg.IsAny<Subscription>())).DoNothing();
+            ExchangeRate exchangeRate = Mock.Create<ExchangeRate>();
+            Dictionary<Currency, decimal> rates = new Dictionary<Currency, decimal>();
+            rates.Add(Currency.USD, new decimal(1.1));
+            rates.Add(Currency.CNY, new decimal(10.8));
+            exchangeRate.Rates = rates;
+            return exchangeRate;
         }
-     
-        private static void MockTradeLog()
+
+        private void CreateTradeWatch()
         {
-            Mock.SetupStatic(typeof(TradeLog));
-            Mock.Arrange(() => TradeLog.Log(Arg.AnyString)).DoNothing();
+            watch = Mock.Create<TradeWatch>(Behavior.CallOriginal);
+            watch.Id = new Guid();
+            Mock.Arrange(() => TradeWatch.SaveToDisk()).DoNothing();
+        }
+        
+        private TradeOrder CreateTradeOrder()
+        {
+            return CreateTradeOrder(10);
+        }
+
+        private TradeOrder CreateTradeOrder(decimal price)
+        {
+            TradeOrder order = Mock.Create<TradeOrder>(Behavior.CallOriginal);
+            Mock.Arrange(() => order.Status).Returns(TradeOrderStatus.Active);
+            order.Volume = 100;
+            order.Price = price;
+            order.Pair = new CurrencyPair(Exchange.Bitfinex, Currency.BTC, Currency.USD);
+            order.Active = true;
+            return order;
         }
     }
 }
