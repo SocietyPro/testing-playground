@@ -79,7 +79,7 @@ namespace Arbitrage
         {
             Mock.Arrange(() => exchangeBase.ExecuteTradeOrder(Arg.IsAny<TradeOrder>())).DoInstead((TradeOrder o) => o.Id="ID");
             Mock.Arrange(() => exchangeBase.PreventPlacingMakerOrderAtMarketPrice).Returns(true);
-            MockLastTrade(12.1);
+            MockLastTrade(12.1m);
             TradeOrder order = CreateTradeOrder(25);
             
             watch.Order = order;
@@ -97,7 +97,7 @@ namespace Arbitrage
             Mock.Arrange(() => exchangeBase.ExecuteTradeOrder(Arg.IsAny<TradeOrder>())).DoInstead((TradeOrder o) => o.Id="ID");
             Mock.Arrange(() => exchangeBase.PreventPlacingMakerOrderAtMarketPrice).Returns(true);
 
-            MockLastTrade(12.1);
+            MockLastTrade(12.1m);
             TradeOrder order = CreateTradeOrder();
             watch.Order = order;
             watch.Create();
@@ -212,16 +212,28 @@ namespace Arbitrage
         [TestMethod]
         public void TestCheckForRecreation()
         {
+            MockLastTrade(12.5m);
+            Mock.Arrange(() => exchangeBase.TradeOrderCancel(Arg.IsAny<TradeOrder>(), Arg.AnyString)).DoInstead((TradeOrder o) => o.IsCancelling = false);
+           
             TradeOrder order = CreateTradeOrder();
+            Mock.Arrange(() => order.Active).Returns(false);
+            Mock.Arrange(() => order.Status).Returns(TradeOrderStatus.Canceled);
             watch.Order = order;
+            watch.PairTaker = new CurrencyPair(Exchange.BTCChina, Currency.CNY, Currency.USD);
+            watch.PairMaker = new CurrencyPair(Exchange.BTCChina, Currency.USD, Currency.CNY);
+
+            Mock.NonPublic.Arrange(watch, "StopMonitoring").DoNothing();
+
+            TradeWatch.Trades.Add(watch);
+
             watch.CheckForRecreation();
                
         }
 
-        private void MockLastTrade(double price)
+        private void MockLastTrade(decimal price)
         {
             Trade trade = new Trade();
-            trade.Price = new decimal(price);
+            trade.Price = price;
             Mock.Arrange(() => db.LastPriceGet(Arg.IsAny<CurrencyPair>())).Returns(trade);
         }
 
